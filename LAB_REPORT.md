@@ -94,36 +94,72 @@ A1 Complete the flowchart with one node for each package and one arrow for each 
 
 ```mermaid
 flowchart TB
-    parcelpoint
+   parcelpoint
     cli
     service
     domain
-    storage
+    storage["storage, accesses the data store"]
+
+    parcelpoint --> cli
+    parcelpoint --> service
+    parcelpoint --> storage
     cli --> service
+    cli --> domain
+    service --> domain
+    service --> storage
+    storage --> domain
 ```
 
 State whether cli depends on storage, and explain why.
+
+No, cli does not depend on storage. It only imports classes from domain and service. It accesses the data layer indirectly through the methods of ParcelService, which adheres to the Dependency Inversion Principle.
 
 A2 Complete the class diagram of the data management layer with ParcelService, the interface ParcelRepository with its three operations, and the two classes that implement it.
 
 ```mermaid
 classDiagram
-    class ParcelService
+    class ParcelService {
+        -ParcelRepository repository
+        +ParcelService(ParcelRepository repository)
+    }
     class ParcelRepository {
         <<interface>>
+        +save(Parcel parcel)
+        +findByCode(String code) Optional~Parcel~
+        +findAll() List~Parcel~
     }
+    class InMemoryParcelRepository
+    class H2ParcelRepository
+
+    ParcelService --> ParcelRepository
+    ParcelRepository <|.. InMemoryParcelRepository
+    ParcelRepository <|.. H2ParcelRepository
 ```
 
 A3 Draw a sequence diagram for the command `store P1003 S1003 MEDIUM`, from the staff member to the repository. Show each message as an operation of the class that receives it.
 
 ```mermaid
 sequenceDiagram
-    actor Staff
+   actor Staff
     participant cli as :ParcelCommandLine
+    participant svc as :ParcelService
+    participant locker as :Locker
+    participant p as :Parcel
+    participant repo as :ParcelRepository
+
     Staff->>cli: store P1003 S1003 MEDIUM
+    cli->>svc: store(parcel)
+    loop for each locker
+        svc->>locker: fits(parcel)
+    end
+    svc->>locker: setParcel(parcel)
+    svc->>p: storeIn(lockerNumber)
+    svc->>repo: save(parcel)
 ```
 
 Explain why the last lifeline is the interface ParcelRepository rather than H2ParcelRepository.
+
+The last lifeline is the interface because ParcelService only knows about the ParcelRepository interface. It has no knowledge of the concrete implementation (H2ParcelRepository). The sequence diagram shows the flow of control at runtime from the perspective of the calling classes. The specific implementation is only chosen once in Main.java, adhering to the Dependency Inversion Principle.
 
 ## Part B. Design questions
 
