@@ -6,10 +6,10 @@ Repository URL: https://github.com/Paulinathequeen/itcs382-h2-lab.git
 
 | Item | Version or name |
 | --- | --- |
-| JDK | |
-| Maven | |
-| IDE | |
-| AI tool and exact model, if you used one | |
+| JDK | 25.0.4 (Eclipse Adoptium) |
+| Maven | 3.10.0 |
+| IDE | Visual Studio Code |
+| AI tool and exact model, if you used one | DeepSeek |
 
 ## Part 0. From a store in memory to H2
 
@@ -184,3 +184,4 @@ I would choose an embedded database like H2. The driving requirement is the need
 | AI tool and exact model | Date | Purpose | Files or answers it produced or changed | How you checked its output |
 | --- | --- | --- | --- | --- |
 | | | | | |
+| DeepSeek | 08.11.2026 | Generating the report texts (Steps 0.8, 0.9, Part B), the Mermaid diagrams, and the findAll method code. | LAB_REPORT.md (texts and diagrams), H2ParcelRepository.java (findAll method) | I manually typed the code into VS Code, ran `mvn package` and the ParcelPoint program to verify it compiled and executed successfully. I checked the Mermaid diagrams using the Markdown preview in VS Code, and verified the SQL outputs by running the H2 Shell. |
