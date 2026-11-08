@@ -165,11 +165,19 @@ The last lifeline is the interface because ParcelService only knows about the Pa
 
 1. Identify the files that you changed to move from the store in memory to H2, and explain why no other class had to change. Use the terms of this course.
 
+I changed `Main.java` (to change the import and instantiate the `H2ParcelRepository`) and `H2ParcelRepository.java` (to implement the `findAll` method). No other class had to change because of the Dependency Inversion Principle: `ParcelService` depends only on the abstract `ParcelRepository` interface. `Main` acts as the composition root and is the only place that knows which concrete data store is used.
+
 2. The PARCEL table stores the size of a parcel as SMALL, MEDIUM or LARGE rather than as 1, 2 or 3. Identify the type of connascence between ParcelSize and the table in each case, and explain which one is weaker.
+
+Storing the names (SMALL, MEDIUM, LARGE) is Connascence of Name, because both the database and the `ParcelSize` enum must agree on the exact string. Storing numbers (1, 2, 3) is Connascence of Convention (or Meaning), because the program must remember what each number represents. Connascence of Name is weaker and safer, because a mismatch immediately throws an exception (e.g., in `ParcelSize.valueOf`), whereas changing the convention of numbers might silently map to the wrong size.
 
 3. Project Phase 2 asks for a data store that needs no separate server. Explain why an embedded database such as H2 meets this rule, and describe the limit of an embedded database that Step 0.8 showed.
 
+Storing the names (SMALL, MEDIUM, LARGE) is Connascence of Name, because both the database and the `ParcelSize` enum must agree on the exact string. Storing numbers (1, 2, 3) is Connascence of Convention (or Meaning), because the program must remember what each number represents. Connascence of Name is weaker and safer, because a mismatch immediately throws an exception (e.g., in `ParcelSize.valueOf`), whereas changing the convention of numbers might silently map to the wrong size.
+
 4. State the data store that you would choose for your Project Phase 2 team, files or an embedded database, the requirement that drives the choice, and the package that will access it.
+
+I would choose an embedded database like H2. The driving requirement is the need for structured relational data and safe querying without the overhead of setting up an external server. It will be accessed exclusively by the `storage` package through a repository interface, keeping the rest of the application independent of the database.
 
 ## AI usage declaration
 
