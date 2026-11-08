@@ -37,21 +37,43 @@ The parcels were kept in the volatile memory (RAM) of the running program, which
 ParcelRepository repository = new InMemoryParcelRepository();
 ```
 
-0.6 Commit of the switch to H2:
+0.6 Commit of the switch to H2: 62b2933 
 
 0.7 Output of `SELECT * FROM PARCEL;` after you stored two parcels:
 
-```text
+```CODE  | STUDENT_ID | PARCEL_SIZE | STATUS | LOCKER_NUMBER
+P1001 | S1001      | SMALL       | STORED | 1
+P1002 | S1002      | LARGE       | STORED | 3
+(2 rows, 13 ms)
 
 ```
 
 0.8 Explain why ParcelPoint could not start while the H2 Shell was open, and identify the class that wrote the message `Cannot create the PARCEL table`.
 
+ParcelPoint could not start because H2 is an embedded database that locks its database file (`parcelpoint.mv.db`) so that only one program can access it at a time. Since the H2 Shell already had the database open, H2 denied access to the ParcelPoint program. The first line of the error was written by the constructor of the `H2ParcelRepository` class, which failed when trying to execute the `CREATE TABLE` statement.
+
 0.9 Explain why `staff` shows no parcel while `find` shows each one, and why all three lockers look free.
+
+The `find` command uses the `findByCode()` method, which is already fully implemented and reads directly from the H2 database. However, the `staff` command relies on the `findAll()` method, which is currently just a stub that returns an empty list (`List.of()`). Because the constructor of `ParcelService` populates the lockers using the result of `findAll()`, it receives no parcels, meaning no lockers are filled and they all appear free.
 
 0.11 Your findAll method:
 
 ```java
+@Override
+public List<Parcel> findAll() {
+    String sql = "SELECT * FROM PARCEL ORDER BY CODE";
+    List<Parcel> parcels = new ArrayList<>();
+    try (Connection connection = connect();
+         PreparedStatement statement = connection.prepareStatement(sql);
+         ResultSet row = statement.executeQuery()) {
+        while (row.next()) {
+            parcels.add(toParcel(row));
+        }
+    } catch (SQLException e) {
+        throw new IllegalStateException("Cannot read the parcels", e);
+    }
+    return parcels;
+}
 
 ```
 
